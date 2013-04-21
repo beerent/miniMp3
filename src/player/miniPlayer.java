@@ -6,28 +6,42 @@ import java.util.Scanner;
 
 import utils.ConfigManager;
 
+import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 
-public class miniPlayer {
+public class miniPlayer extends Thread {
 
-	private String filename; 
+	private String filename;
 	private Player player;
+	private boolean ready = false;
 
 	public miniPlayer(String filename) {
-		this.filename = filename;		
+		this.filename = filename;
 	}
 
-	public void play() {
+	public miniPlayer() {
+		this.filename = null;
+	}
+
+	public void run() {
 		try {
 			BufferedInputStream buffer = new BufferedInputStream(
 					new FileInputStream(filename));
 			player = new Player(buffer);
-			player.play();
+			ready = true;
+			play();
 		} catch (Exception e) {
 
 			System.out.println(e);
 		}
+	}
 
+	public void play() {
+		try {
+			if(ready) player.play();
+		} catch (JavaLayerException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public static void main(String[] args) {
@@ -35,7 +49,5 @@ public class miniPlayer {
 		System.out.print("Enter Song Name: ");
 		miniPlayer mp3 = new miniPlayer(sc.next());
 		mp3.play();
-
 	}
-
 }

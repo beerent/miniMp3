@@ -1,7 +1,10 @@
 package utils;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.Scanner;
@@ -16,7 +19,6 @@ public class ConfigManager {
 
 	public ConfigManager() {
 		configFile = null;
-		report("loading configuration file");
 		loadConfig();
 		
 	}
@@ -27,15 +29,19 @@ public class ConfigManager {
 			try {
 				out = new PrintStream(f);
 				writeNewConfigFile();
+				report("config file created.");
 			} catch (FileNotFoundException e) {e.printStackTrace();}
-		}else{
-			report("configuration file found");
-			configFile = f;						
+		}else{				
 		}
+		setConfigFile(f);
 	}
 	
 	public File getConfigFile(){
 		return configFile;
+	}
+	
+	private void setConfigFile(File configFile){
+		this.configFile = configFile;
 	}
 
 	public void writeNewConfigFile() {
@@ -51,7 +57,14 @@ public class ConfigManager {
 	
 	//report a string to the console. updates/ 
 	private void report(String s){
-		System.out.println("[System] " + s);
+		File f = new File("src/data/report");
+		try {
+			BufferedWriter out = new BufferedWriter(new FileWriter(f, true));
+			out.write(s + "\n");
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	//adds a folder to list of folders where music is stored
