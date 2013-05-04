@@ -22,7 +22,7 @@ import utils.ConfigManager;
 public class brentmp3 extends Thread {
 	private String programName = "BrentMp3";
 	private ConfigManager loader;
-	private String[] songTitles;
+	private String[] playlist;
 	private int songCount;
 	private File configFile;
 	private int songMaxSize;
@@ -35,7 +35,7 @@ public class brentmp3 extends Thread {
 
 	public void run() {
 		loadPlayer();
-		loadSongs();
+		loadPlaylist();
 		this.ready = true;
 	}
 
@@ -50,8 +50,8 @@ public class brentmp3 extends Thread {
 			return "player not ready";
 	}
 
-	private void loadSongs() {
-		this.songTitles = new String[songMaxSize]; // default amount of songs to
+	private void loadPlaylist() {
+		this.playlist = new String[songMaxSize]; // default amount of songs to
 													// 1,000
 		Scanner sc = null;
 		this.songCount = 0;
@@ -122,7 +122,7 @@ public class brentmp3 extends Thread {
 				return null;
 		}
 		int song = new Random().nextInt(songCount);
-		return songTitles[song];
+		return playlist[song];
 
 	}
 
@@ -134,15 +134,15 @@ public class brentmp3 extends Thread {
 
 	public void addSong(String file) {
 		report("adding " + file + " to library");
-		songTitles[songCount] = new File(file).getAbsolutePath();
+		playlist[songCount] = new File(file).getAbsolutePath();
 		songCount++;
 		if (songCount == songMaxSize) {
 			songMaxSize *= 2;
 			String[] temp = new String[songMaxSize];
-			for (int i = 0; i < songTitles.length; i++) {
-				temp[i] = songTitles[i];
+			for (int i = 0; i < playlist.length; i++) {
+				temp[i] = playlist[i];
 			}
-			songTitles = temp;
+			playlist = temp;
 		}
 	}
 
@@ -153,5 +153,47 @@ public class brentmp3 extends Thread {
 			throw new Exception("folder location " + file + " does not exist");
 		}
 		loader.addSourceFolder(new File(file));
+	}
+	
+	public void addToPlayList(String [] songs, String song, int currentSize){
+		if(currentSize == songs.length){
+			String [] tempSongs = songs;
+			songs = new String [songs.length+100];
+			for(int i = 0; i < tempSongs.length; i++){
+				songs[i] = tempSongs[i];
+			}
+		}
+		songs[currentSize] = song;
+	}
+	
+	public void makePlayList(String searchToken){
+		//TODO
+		//properly add a new song using one method (addSong())
+		if(ready){
+			int currentSize = 0;
+			String [] songs = new String [100];
+			String [] oldSongs = playlist;
+			for(String song : playlist){
+				if(song == null) break;
+				if(new File(song).getName().toLowerCase().contains(searchToken.toLowerCase())){
+					addToPlayList(songs, song, currentSize);
+					currentSize++;
+				}	
+			}
+			playlist = songs;
+		}
+		report("no songs found.");
+	}
+	
+	public void loadMainPlaylist(){
+		loadPlaylist();
+	}
+	
+	public void listCurrentPlaylist(){
+		System.out.println(Arrays.toString(playlist));
+	}
+	
+	public String makePlayList(){
+		return null;
 	}
 }

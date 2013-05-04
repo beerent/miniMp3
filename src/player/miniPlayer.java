@@ -22,6 +22,10 @@ public class miniPlayer extends Thread {
 	public miniPlayer() {
 		this.filename = null;
 	}
+	
+	public miniPlayer(brentmp3 player){
+		
+	}
 
 	public void run() {
 		try {
